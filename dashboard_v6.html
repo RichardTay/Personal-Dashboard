@@ -1,0 +1,812 @@
+<!--
+  Workspace Dashboard (v6)
+  Author: Charlie
+  Last Edited: 2025-10-31
+  Notes:
+  - Base cleaned for easy manual editing
+  - Flattened categories with toolbar, theme, favorites, import/export, drag-drop ready
+  - DODO card deduplicated and correctly categorized
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workspace Dashboard · Flat (Merged All)</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --panel-2: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --brand: #60a5fa;
+      --brand-2: #22d3ee;
+      --card: #111827;
+      --card-hover: #1f2937;
+      --border: #243244;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --panel-2: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --brand: #0ea5e9;
+        --brand-2: #22c55e;
+        --card: #ffffff;
+        --card-hover: #f1f5f9;
+        --border: #e2e8f0;
+        --shadow: 0 10px 30px rgba(0,0,0,.08);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; padding: 32px;
+      background: radial-gradient(1200px 700px at 10% -10%, rgba(34,211,238,.08), transparent 60%),
+                  radial-gradient(1000px 600px at 110% 10%, rgba(96,165,250,.10), transparent 60%),
+                  var(--bg);
+      color: var(--text); font: 500 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    header {
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .title {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo {
+      width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: white; font-weight: 800; box-shadow: var(--shadow);
+    }
+    h1 { font-size: 20px; margin: 0; letter-spacing: .2px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .btn {
+      appearance: none; border: 1px solid var(--border); background: var(--panel);
+      color: var(--text); border-radius: 999px; padding: 10px 14px; cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .clock { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+    .searchbar {
+      position: relative; margin: 14px 0 22px;
+    }
+    .searchbar input {
+      width: 100%; padding: 16px 48px 16px 48px; border-radius: var(--radius);
+      border: 1px solid var(--border); outline: none; background: var(--panel);
+      color: var(--text); box-shadow: var(--shadow);
+    }
+    .searchbar .hint {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 12px; color: var(--muted);
+      border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px;
+      background: var(--panel-2);
+    }
+    .searchbar .icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      opacity: .7;
+    }
+
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    }
+
+    .card {
+      display: flex; align-items: center; gap: 12px; text-decoration: none;
+      background: linear-gradient(180deg, var(--card), var(--panel-2));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px; color: var(--text); box-shadow: var(--shadow);
+      transition: transform .15s ease, background .2s ease;
+    }
+    .card:hover { transform: translateY(-2px); background: var(--card-hover); }
+    .card .emoji {
+      width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(34,211,238,.25));
+      border: 1px solid var(--border);
+      font-size: 20px;
+      flex: 0 0 36px;
+    }
+    .card h3 { margin: 0; font-size: 15px; font-weight: 700; }
+    .card p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    .section {
+      margin: 26px 0 8px; display: flex; align-items: baseline; gap: 10px;
+    }
+    .section h2 { margin: 0; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .section .line { height: 1px; background: var(--border); flex: 1; }
+
+    footer { margin: 28px 0 8px; color: var(--muted); font-size: 12px; text-align: center; }
+
+    .hide { display: none !important; }
+
+    a:focus-visible, input:focus-visible, button:focus-visible {
+      outline: 2px solid var(--brand); outline-offset: 2px;
+    }
+    .subhead { margin: 14px 0 6px; font-weight: 800; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+
+    .card.active { outline: 2px solid var(--brand); outline-offset: 2px; transform: translateY(-3px) scale(1.01); }
+    .toolbar .btn { white-space: nowrap; }
+
+    .card { position: relative; }
+    .card.starred::after {
+      content: "★";
+      position: absolute; top: 8px; right: 10px;
+      font-size: 14px; opacity: .9;
+    }
+    body[data-fav-only="1"] .card:not(.starred) { display: none !important; }
+
+/* --- Drag & Drop styles --- */
+.card[draggable="true"] { user-select: none; }
+.card.dragging { opacity: .55; transform: scale(0.98); }
+.drop-marker { height: 0; border-top: 2px dashed var(--brand); margin: 6px 0; }
+.grid.drop-target { outline: 2px dashed var(--brand); outline-offset: 6px; }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+  <div class="title"><div class="logo">WS</div>
+  <div class="toolbar"><span class="clock" id="clock">--:--</span>
+        <button class="btn" id="themeBtn" title="Toggle theme (t)">🌓 Theme</button>
+
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+        <button class="btn" id="importBtn" title="Import JSON (i)">📥 Import</button>
+        <button class="btn" id="exportBtn" title="Export JSON (e)">📤 Export</button>
+        <button class="btn" id="favToggleBtn" title="Show Starred Only (f)">⭐ Starred Only</button></div>
+</header>
+
+    <div class="searchbar">
+
+      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" opacity=".6"></circle>
+        <path d="M20 20L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".6"></path>
+      </svg>
+      <input id="q" type="search" placeholder="Search links…" autocomplete="off" />
+      <span class="hint">Enter ↵ 打开第一个结果</span>
+    </div>
+
+    <div class="section"><h2>Writing & Communication</h2><div class="line"></div></div>
+    <div class="grid" id="<a class="card" href="https://www.135editor.com/" target="_blank" data-tags="">
+  <div class="emoji">🔗">grid-writing</div>
+  <div><h3>135 编辑器</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://extremesafelist.com/members/index.php" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Extreme safe list</h3><p>Link</p></div>
+</a></div>
+
+    <div class="section"><h2>Social & Start</h2><div class="line"></div></div>
+    <div class="grid" id="<a class="card" href="https://web.whatsapp.com/" target="_blank" data-tags="">
+  <div class="emoji">🔗">grid-social</div>
+  <div><h3>whatsappp</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://twitter.com/home?lang=en" target="_blank" data-tags="social,start">
+  <div class="emoji">🐦</div>
+  <div><h3>X (Twitter)</h3><p>Feed</p></div>
+</a>
+      <a class="card" href="https://facebook.com" target="_blank" data-tags="social,start">
+  <div class="emoji">📘</div>
+  <div><h3>Facebook</h3><p>Social</p></div>
+</a></div>
+
+    <div class="section"><h2>AI & Tools</h2><div class="line"></div></div>
+    <div class="grid" id="<a class="card" href="https://pplx.ai/leoz_00785668" target="_blank" data-tags="">
+  <div class="emoji">🔗">grid-ai</div>
+  <div><h3>comet promo link</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://console.anthropic.com/settings/billing" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>claude console - billing</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://www.deepseek.com/en" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Deepseek</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://chatgpt.com/" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>ChatGPT</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://gmail.com" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>gmail.com</h3><p>Link</p></div>
+</a>
+      </div>
+
+    <div class="section"><h2>Publishing & Stores</h2><div class="line"></div></div>
+    <div class="grid" id="<a class="card" href="https://payhip.com/dashboard" target="_blank" data-tags="">
+  <div class="emoji">🔗">grid-pub</div>
+  <div><h3>payhip</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://kdp.amazon.com/en_US/bookshelf" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>amazon - kdp</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://trends.google.com/trending?geo=US" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>trending now - google books partner center</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://play.google.com/books/publish/a/16164735111736140436#home" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>google books partner center</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://gumroad.com/products" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>gumroad - products</h3><p>Link</p></div>
+</a></div>
+
+    <div class="section"><h2>DeFi & Farms</h2><div class="line"></div></div>
+    <div class="grid" id="<a class="card" href="https://apeswap.finance/farms" target="_blank" data-tags="defi,matic">
+  <div class="emoji">🐵">grid-defi</div>
+  <div><h3>ApeSwap</h3><p>MATIC</p></div>
+</a>
+      <a class="card" href="https://app.wault.finance/#farm" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🛡️</div>
+  <div><h3>Wault Finance</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://app.dodoex.io/mining?network=bsc-mainnet" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>DODO farm</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://pancakebunny.finance/pool" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Pancake Bunny</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://pancakeswap.finance/pools" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🥞</div>
+  <div><h3>PancakeSwap</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://pantherswap.com/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>PatherSwap Farms</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://dopple.finance/Stake" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Dopple Finance Farms</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://zefi.zcore.network/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Zcore Finance Farms</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://app.treedefi.com/#/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Tree Defi Farms</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://pancakeswap.finance/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>pancakeswap farm</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://www.goosedefi.com/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>goose finance</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://evodefi.com/farms" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
+  <div><h3>Evodefi finance</h3><p>Link</p></div>
+</a>
+      <a class="card" href="https://bnbseed.io/" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🌱</div>
+  <div><h3>BNB Seed</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://busd.genesisfarm.app/#0x5332fe451c2fDF4AfA129D3725669e582C825837" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🌾</div>
+  <div><h3>Genesis Farm (BUSD)</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://www.binance.com/en/my/wallet/account/main" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🟡</div>
+  <div><h3>Binance · Spot Wallet</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://nominex.io/my/nmx/personal-staking" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">💠</div>
+  <div><h3>Nominex</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://biswap.org/farms" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">🧩</div>
+  <div><h3>BiSwap</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://drip.community/faucet" target="_blank" data-tags="defi,bsc">
+  <div class="emoji">💧</div>
+  <div><h3>Drip Community</h3><p>BSC</p></div>
+</a>
+      <a class="card" href="https://app.uniswap.org/#/pool?chain=mainnet" target="_blank" data-tags="defi,eth">
+  <div class="emoji">🦄</div>
+  <div><h3>Uniswap</h3><p>ETH</p></div>
+</a>
+      <a class="card" href="https://app.compound.finance/" target="_blank" data-tags="defi,eth">
+  <div class="emoji">🏦</div>
+  <div><h3>Compound</h3><p>ETH</p></div>
+</a>
+      <a class="card" href="https://app.ether.fi/" target="_blank" data-tags="defi,eth">
+  <div class="emoji">💠</div>
+  <div><h3>app.ether.fi</h3><p>ETH</p></div>
+</a>
+      <a class="card" href="https://claim.ether.fi/" target="_blank" data-tags="defi,eth">
+  <div class="emoji">💠</div>
+  <div><h3>claim.ether.fi</h3><p>ETH</p></div>
+</a>
+      <a class="card" href="https://app.ether.fi/liquid" target="_blank" data-tags="defi,eth">
+  <div class="emoji">💠</div>
+  <div><h3>app.ether.fi/liquid</h3><p>ETH</p></div>
+</a>
+      <a class="card" href="https://quickswap.exchange/#/quick" target="_blank" data-tags="defi,matic">
+  <div class="emoji">⚡</div>
+  <div><h3>QuickSwap</h3><p>MATIC</p></div>
+</a>
+      <a class="card" href="https://stableone.io/" target="_blank" data-tags="defi,matic">
+  <div class="emoji">🧱</div>
+  <div><h3>StableOne</h3><p>MATIC</p></div>
+</a>
+      <a class="card" href="https://app.wault.finance/polygon/index.html#farm" target="_blank" data-tags="defi,matic">
+  <div class="emoji">🛡️</div>
+  <div><h3>Wault Finance</h3><p>MATIC</p></div>
+</a>
+      <a class="card" href="https://polygonfarm.finance/farms" target="_blank" data-tags="defi,matic">
+  <div class="emoji">🔺</div>
+  <div><h3>PolygonFarm</h3><p>MATIC</p></div>
+</a></div>
+  </div>
+
+  <script>
+    const clockEl = document.getElementById('clock');
+    function updateClock() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      clockEl.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    updateClock();
+    setInterval(updateClock, 1000 * 30);
+
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    const THEME_KEY = 'ws-theme';
+    function applyTheme(v) {
+      if (v === 'light') {
+        root.style.colorScheme = 'light';
+        document.body.dataset.theme = 'light';
+      } else if (v === 'dark') {
+        root.style.colorScheme = 'dark';
+        document.body.dataset.theme = 'dark';
+      } else {
+        root.style.colorScheme = '';
+        delete document.body.dataset.theme;
+      }
+    }
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) applyTheme(savedTheme);
+    themeBtn.addEventListener('click', () => {
+      const cur = localStorage.getItem(THEME_KEY) || 'auto';
+      const next = cur === 'dark' ? 'light' : cur === 'light' ? 'auto' : 'dark';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        themeBtn.click();
+      }
+    });
+
+    const q = document.getElementById('q');
+    const cards = Array.from(document.querySelectorAll('.card'));
+    function filter() {
+      const term = q.value.trim().toLowerCase();
+      let firstVisible = null;
+      cards.forEach(a => {
+        const text = (a.textContent + ' ' + (a.dataset.tags || '')).toLowerCase();
+        const match = !term || text.includes(term);
+        a.classList.toggle('hide', !match);
+        if (match && !firstVisible) firstVisible = a;
+      });
+      return firstVisible;
+    }
+    q.addEventListener('input', filter);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault(); q.focus();
+      }
+      if (e.key === 'Enter' && document.activeElement === q) {
+        const first = filter();
+        if (first) window.open(first.href, '_blank', 'noopener,noreferrer');
+      }
+    });
+    filter();
+
+// ===== Import / Export JSON =====
+const importBtn = document.getElementById('importBtn');
+const exportBtn = document.getElementById('exportBtn');
+const importFile = document.getElementById('importFile');
+
+function collectCards() {
+  const data = [];
+  const allCards = Array.from(document.querySelectorAll('.card'));
+  for (const a of allCards) {
+    const h3 = a.querySelector('h3')?.textContent?.trim() || '';
+    const p = a.querySelector('p')?.textContent?.trim() || '';
+    const href = a.getAttribute('href');
+    const tags = a.dataset.tags || '';
+    // derive section
+    let section = '';
+    let chain = '';
+    const grid = a.closest('.grid');
+    if (grid?.id) {
+      if (grid.id.startsWith('grid-')) section = grid.id.replace('grid-','');
+    }
+    const sub = a.closest('.chain-sections');
+    if (sub) {
+      // Find previous .subhead text for chain name
+      const subhead = (function(el){
+        while (el && !el.classList?.contains('subhead')) el = el.previousElementSibling;
+        return el;
+      })(a.closest('.grid')?.previousElementSibling);
+      chain = subhead?.textContent?.trim() || '';
+      section = 'defi';
+    }
+    data.push({ title: h3, desc: p, href, tags, section, chain });
+  }
+  return data;
+}
+
+function downloadJSON(obj, filename) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+}
+
+exportBtn?.addEventListener('click', () => {
+  const payload = { generatedAt: new Date().toISOString(), items: collectCards() };
+  downloadJSON(payload, 'workspace_links.json');
+});
+importBtn?.addEventListener('click', () => importFile.click());
+importFile?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0]; if (!file) return;
+  const text = await file.text();
+  try {
+    const json = JSON.parse(text);
+    const items = Array.isArray(json) ? json : (json.items || []);
+    if (!Array.isArray(items)) throw new Error('Invalid JSON structure');
+    addImportedItems(items);
+    alert('Imported ' + items.length + ' link(s)');
+  } catch(err) {
+    console.error(err);
+    alert('Import failed: ' + err.message);
+  } finally {
+    importFile.value = '';
+  }
+});
+
+function ensureImportedSection() {
+  let section = document.querySelector('#grid-imported');
+  if (!section) {
+    const host = document.querySelector('.wrap footer').previousElementSibling; // before footer
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div class="section"><h2>Imported</h2><div class="line"></div></div>
+      <div class="grid" id="">grid-imported</div>
+    `;
+    host.parentNode.insertBefore(container, host);
+    section = container.querySelector('#grid-imported');
+  }
+  return section;
+}
+
+function mkCard({href, title, desc, emoji='🔗', tags=''}) {
+  const a = document.createElement('a');
+  a.className = 'card'; a.href = href; a.target = '_blank'; a.dataset.tags = tags;
+  a.innerHTML = `<div class="emoji">${emoji}</div><div><h3>${title||href}</h3><p>${desc||''}</p></div>`;
+  return a;
+}
+
+function addImportedItems(items) {
+  const grids = {
+    writing: '#grid-writing',
+    ai: '#grid-ai',
+    pub: '#grid-pub',
+    defi: '#grid-defi',
+    social: '#grid-social',
+    imported: '#grid-imported'
+  };
+  const dedupe = new Set(Array.from(document.querySelectorAll('.card')).map(a=>a.href));
+  for (const it of items) {
+    if (!it || !it.href || dedupe.has(it.href)) continue;
+    const sec = (it.section||'').toLowerCase();
+    let gridSel = grids[sec] || grids.imported;
+    // If chain specified under defi, attempt to place under the chain subsections grid right after subhead
+    if (sec === 'defi' && it.chain) {
+      const subheads = Array.from(document.querySelectorAll('.subhead'));
+      const targetHead = subheads.find(el => el.textContent.trim().toLowerCase() === String(it.chain).toLowerCase());
+      if (targetHead) {
+        const gridAfter = targetHead.nextElementSibling;
+        if (gridAfter && gridAfter.classList.contains('grid')) {
+          gridAfter.appendChild(mkCard(it));
+          dedupe.add(it.href);
+          continue;
+        }
+      }
+    }
+    const grid = document.querySelector(gridSel) || ensureImportedSection();
+    grid.appendChild(mkCard(it));
+    dedupe.add(it.href);
+  }
+}
+
+// Add keyboard shortcuts for Import/Export
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (e.key.toLowerCase() === 'e') { e.preventDefault(); exportBtn?.click(); }
+  if (e.key.toLowerCase() === 'i') { e.preventDefault(); importBtn?.click(); }
+});
+
+// ===== Keyboard Navigation (↑ / ↓ selects visible cards, Enter opens) =====
+let activeIndex = -1;
+function visibleCards() {
+  return Array.from(document.querySelectorAll('.card')).filter(c => c.offsetParent !== null);
+}
+function setActive(idx) {
+  const cards = visibleCards();
+  cards.forEach(c => c.classList.remove('active'));
+  if (cards.length === 0) { activeIndex = -1; return; }
+  activeIndex = ((idx % cards.length) + cards.length) % cards.length;
+  cards[activeIndex].classList.add('active');
+  cards[activeIndex].scrollIntoView({block:'nearest', inline:'nearest'});
+}
+document.addEventListener('keydown', (e) => {
+  // Skip when typing in search
+  if (document.activeElement === q) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); }
+  if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(activeIndex - 1); }
+  if (e.key === 'Enter' && activeIndex >= 0) {
+    e.preventDefault();
+    const cards = visibleCards();
+    const a = cards[activeIndex];
+    if (a) window.open(a.href, '_blank', 'noopener,noreferrer');
+  }
+});
+// Initialize selection to first visible card
+setActive(0);
+
+// ===== Favorites (Star) + Starred Only Toggle =====
+const favToggleBtn = document.getElementById('favToggleBtn');
+const STARS_KEY = 'ws-stars';
+const FAVONLY_KEY = 'ws-stars-only';
+
+function getStars() {
+  try { return new Set(JSON.parse(localStorage.getItem(STARS_KEY) || '[]')); }
+  catch { return new Set(); }
+}
+function saveStars(set) {
+  localStorage.setItem(STARS_KEY, JSON.stringify(Array.from(set)));
+}
+function applyStarClasses() {
+  const stars = getStars();
+  document.querySelectorAll('.card').forEach(c => {
+    if (stars.has(c.href)) c.classList.add('starred');
+    else c.classList.remove('starred');
+  });
+}
+function setFavOnly(on) {
+  document.body.dataset.favOnly = on ? '1' : '';
+  localStorage.setItem(FAVONLY_KEY, on ? '1' : '');
+}
+function getFavOnly() { return localStorage.getItem(FAVONLY_KEY) === '1'; }
+
+// Initialize star state & fav-only from storage
+applyStarClasses();
+setFavOnly(getFavOnly());
+
+favToggleBtn?.addEventListener('click', () => {
+  setFavOnly(!getFavOnly());
+  // re-run filter so visibleCards() reflects current state
+  filter && filter();
+});
+
+// Keyboard: 's' to star/unstar the active card; 'f' to toggle fav-only
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (e.key.toLowerCase() === 'f') { e.preventDefault(); favToggleBtn?.click(); }
+  if (e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    const cards = visibleCards ? visibleCards() : Array.from(document.querySelectorAll('.card'));
+    const a = (typeof activeIndex === 'number' && activeIndex >= 0) ? cards[activeIndex] : null;
+    if (!a) return;
+    const stars = getStars();
+    if (stars.has(a.href)) { stars.delete(a.href); a.classList.remove('starred'); }
+    else { stars.add(a.href); a.classList.add('starred'); }
+    saveStars(stars);
+  }
+});
+
+// Re-apply stars when new cards are added (e.g., after import)
+const mo = new MutationObserver(() => applyStarClasses());
+mo.observe(document.body, {childList:true, subtree:true});
+
+// ===== Numeric shortcuts (1–9) open Nth visible card =====
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  // Ignore if any modifier held
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (/^[1-9]$/.test(e.key)) {
+    const n = parseInt(e.key, 10);
+    const cards = visibleCards();
+    if (cards.length >= n) {
+      e.preventDefault();
+      window.open(cards[n-1].href, '_blank', 'noopener,noreferrer');
+    }
+  }
+});
+
+// Re-run filter after toggling fav-only or when typing, so number keys map to current visible set
+if (typeof q !== 'undefined') {
+  q.addEventListener('input', () => { filter && filter(); });
+}
+
+</script>
+
+<script>
+// ===== Drag & Drop reordering (document-level handlers) =====
+(function() {
+  const STORAGE_KEY = 'ws-grid-order-v2'; // new key to avoid stale data shape
+
+  function getStore() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    catch { return {}; }
+  }
+  function setStore(obj) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  }
+  function saveGridOrder(grid) {
+    if (!grid || !grid.id) return;
+    const store = getStore();
+    store[grid.id] = Array.from(grid.querySelectorAll('.card')).map(a => a.href);
+    setStore(store);
+  }
+  function restoreAll() {
+    const store = getStore();
+    document.querySelectorAll('.grid[id]').forEach(grid => {
+      const order = store[grid.id];
+      if (!order || !order.length) return;
+      const byHref = {};
+      grid.querySelectorAll('.card').forEach(a => byHref[a.href] = a);
+      order.forEach(href => { if (byHref[href]) grid.appendChild(byHref[href]); });
+    });
+  }
+
+  // Make cards draggable and suppress click after drag
+  function makeDraggable(card) {
+    if (!card || card.dataset.dndReady === '1') return;
+    card.dataset.dndReady = '1';
+    card.draggable = true;
+
+    let dragMoved = false;
+
+    card.addEventListener('dragstart', (e) => {
+      dragMoved = false;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      // set data to allow drop in all browsers
+      e.dataTransfer.setData('text/uri-list', card.href || '');
+      e.dataTransfer.setData('text/plain', card.href || '');
+      card.__lastGrid = card.closest('.grid');
+    });
+
+    // Track movement during drag to suppress accidental clicks
+    card.addEventListener('drag', () => { dragMoved = true; });
+
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      document.querySelectorAll('.drop-marker').forEach(el => el.remove());
+    });
+
+    card.addEventListener('click', (e) => {
+      if (dragMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  }
+
+  // Initialize for existing cards
+  document.querySelectorAll('.card').forEach(makeDraggable);
+  // Observe new cards (e.g., after Import)
+  const mo = new MutationObserver((mut) => {
+    mut.forEach(m => m.addedNodes && m.addedNodes.forEach(n => {
+      if (n.nodeType !== 1) return;
+      if (n.classList && n.classList.contains('card')) makeDraggable(n);
+      n.querySelectorAll && n.querySelectorAll('.card').forEach(makeDraggable);
+    }));
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  // Visuals
+  function ensureMarker(container) {
+    let marker = container.querySelector(':scope > .drop-marker');
+    if (!marker) {
+      marker = document.createElement('div');
+      marker.className = 'drop-marker';
+      container.appendChild(marker);
+    }
+    return marker;
+  }
+  function getDragAfterElement(container, y) {
+    const items = [...container.querySelectorAll(':scope > .card:not(.dragging)')];
+    let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
+    items.forEach(child => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        closest = { offset, element: child };
+      }
+    });
+    return closest.element;
+  }
+
+  // Document-level handlers for dragover/drop so that drops work on children
+  let currentGrid = null;
+
+  document.addEventListener('dragover', (e) => {
+    const dragging = document.querySelector('.card.dragging');
+    if (!dragging) return;
+    const grid = e.target.closest && e.target.closest('.grid');
+    if (!grid) return;
+    e.preventDefault(); // allow drop
+    currentGrid = grid;
+    grid.classList.add('drop-target');
+    const marker = ensureMarker(grid);
+    const after = getDragAfterElement(grid, e.clientY);
+    if (after) grid.insertBefore(marker, after);
+    else grid.appendChild(marker);
+    e.dataTransfer.dropEffect = 'move';
+  });
+
+  document.addEventListener('dragleave', (e) => {
+    const grid = e.target.closest && e.target.closest('.grid');
+    if (grid && !grid.contains(e.relatedTarget)) {
+      grid.classList.remove('drop-target');
+      const marker = grid.querySelector(':scope > .drop-marker');
+      if (marker) marker.remove();
+    }
+  });
+
+  document.addEventListener('drop', (e) => {
+    const dragging = document.querySelector('.card.dragging');
+    const grid = e.target.closest && e.target.closest('.grid');
+    if (!dragging || !grid) return;
+    e.preventDefault();
+    const marker = grid.querySelector(':scope > .drop-marker');
+    if (marker) {
+      grid.insertBefore(dragging, marker);
+      marker.remove();
+    } else {
+      grid.appendChild(dragging);
+    }
+    // Save orders (from & to)
+    const from = dragging.__lastGrid || dragging.closest('.grid');
+    if (from && from.id) saveGridOrder(from);
+    if (grid && grid.id) saveGridOrder(grid);
+    grid.classList.remove('drop-target');
+  });
+
+  // Restore on load
+  window.addEventListener('load', restoreAll, { once: true });
+})();
+</script>
+
+</body>
+</html>

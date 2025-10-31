@@ -1,12 +1,3 @@
-<!--
-  Workspace Dashboard (v6)
-  Author: Charlie
-  Last Edited: 2025-10-31
-  Notes:
-  - Base cleaned for easy manual editing
-  - Flattened categories with toolbar, theme, favorites, import/export, drag-drop ready
-  - DODO card deduplicated and correctly categorized
--->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -138,10 +129,10 @@
       outline: 2px solid var(--brand); outline-offset: 2px;
     }
     .subhead { margin: 14px 0 6px; font-weight: 800; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
-
+  
     .card.active { outline: 2px solid var(--brand); outline-offset: 2px; transform: translateY(-3px) scale(1.01); }
     .toolbar .btn { white-space: nowrap; }
-
+  
     .card { position: relative; }
     .card.starred::after {
       content: "★";
@@ -149,7 +140,7 @@
       font-size: 14px; opacity: .9;
     }
     body[data-fav-only="1"] .card:not(.starred) { display: none !important; }
-
+  
 /* --- Drag & Drop styles --- */
 .card[draggable="true"] { user-select: none; }
 .card.dragging { opacity: .55; transform: scale(0.98); }
@@ -164,7 +155,7 @@
   <div class="title"><div class="logo">WS</div>
   <div class="toolbar"><span class="clock" id="clock">--:--</span>
         <button class="btn" id="themeBtn" title="Toggle theme (t)">🌓 Theme</button>
-
+      
         <input id="importFile" type="file" accept="application/json" style="display:none" />
         <button class="btn" id="importBtn" title="Import JSON (i)">📥 Import</button>
         <button class="btn" id="exportBtn" title="Export JSON (e)">📤 Export</button>
@@ -182,8 +173,8 @@
     </div>
 
     <div class="section"><h2>Writing & Communication</h2><div class="line"></div></div>
-    <div class="grid" id="<a class="card" href="https://www.135editor.com/" target="_blank" data-tags="">
-  <div class="emoji">🔗">grid-writing</div>
+    <div class="grid" id="grid-writing"><a class="card" href="https://www.135editor.com/" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
   <div><h3>135 编辑器</h3><p>Link</p></div>
 </a>
       <a class="card" href="https://extremesafelist.com/members/index.php" target="_blank" data-tags="">
@@ -192,8 +183,8 @@
 </a></div>
 
     <div class="section"><h2>Social & Start</h2><div class="line"></div></div>
-    <div class="grid" id="<a class="card" href="https://web.whatsapp.com/" target="_blank" data-tags="">
-  <div class="emoji">🔗">grid-social</div>
+    <div class="grid" id="grid-social"><a class="card" href="https://web.whatsapp.com/" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
   <div><h3>whatsappp</h3><p>Link</p></div>
 </a>
       <a class="card" href="https://twitter.com/home?lang=en" target="_blank" data-tags="social,start">
@@ -206,8 +197,8 @@
 </a></div>
 
     <div class="section"><h2>AI & Tools</h2><div class="line"></div></div>
-    <div class="grid" id="<a class="card" href="https://pplx.ai/leoz_00785668" target="_blank" data-tags="">
-  <div class="emoji">🔗">grid-ai</div>
+    <div class="grid" id="grid-ai"><a class="card" href="https://pplx.ai/leoz_00785668" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
   <div><h3>comet promo link</h3><p>Link</p></div>
 </a>
       <a class="card" href="https://console.anthropic.com/settings/billing" target="_blank" data-tags="">
@@ -229,8 +220,8 @@
       </div>
 
     <div class="section"><h2>Publishing & Stores</h2><div class="line"></div></div>
-    <div class="grid" id="<a class="card" href="https://payhip.com/dashboard" target="_blank" data-tags="">
-  <div class="emoji">🔗">grid-pub</div>
+    <div class="grid" id="grid-pub"><a class="card" href="https://payhip.com/dashboard" target="_blank" data-tags="">
+  <div class="emoji">🔗</div>
   <div><h3>payhip</h3><p>Link</p></div>
 </a>
       <a class="card" href="https://kdp.amazon.com/en_US/bookshelf" target="_blank" data-tags="">
@@ -251,8 +242,8 @@
 </a></div>
 
     <div class="section"><h2>DeFi & Farms</h2><div class="line"></div></div>
-    <div class="grid" id="<a class="card" href="https://apeswap.finance/farms" target="_blank" data-tags="defi,matic">
-  <div class="emoji">🐵">grid-defi</div>
+    <div class="grid" id="grid-defi"><a class="card" href="https://apeswap.finance/farms" target="_blank" data-tags="defi,matic">
+  <div class="emoji">🐵</div>
   <div><h3>ApeSwap</h3><p>MATIC</p></div>
 </a>
       <a class="card" href="https://app.wault.finance/#farm" target="_blank" data-tags="defi,bsc">
@@ -425,7 +416,7 @@
       }
     });
     filter();
-
+  
 // ===== Import / Export JSON =====
 const importBtn = document.getElementById('importBtn');
 const exportBtn = document.getElementById('exportBtn');
@@ -499,7 +490,7 @@ function ensureImportedSection() {
     const container = document.createElement('div');
     container.innerHTML = `
       <div class="section"><h2>Imported</h2><div class="line"></div></div>
-      <div class="grid" id="">grid-imported</div>
+      <div class="grid" id="grid-imported"></div>
     `;
     host.parentNode.insertBefore(container, host);
     section = container.querySelector('#grid-imported');
@@ -582,6 +573,7 @@ document.addEventListener('keydown', (e) => {
 // Initialize selection to first visible card
 setActive(0);
 
+
 // ===== Favorites (Star) + Starred Only Toggle =====
 const favToggleBtn = document.getElementById('favToggleBtn');
 const STARS_KEY = 'ws-stars';
@@ -658,6 +650,7 @@ if (typeof q !== 'undefined') {
 }
 
 </script>
+
 
 <script>
 // ===== Drag & Drop reordering (document-level handlers) =====
